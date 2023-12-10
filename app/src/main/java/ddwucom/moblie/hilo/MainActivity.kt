@@ -1,11 +1,12 @@
 package ddwucom.moblie.hilo
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import ddwucom.moblie.hilo.base.BaseActivity
+import ddwucom.moblie.hilo.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
     }
 }
