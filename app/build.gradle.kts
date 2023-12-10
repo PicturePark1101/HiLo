@@ -62,6 +62,8 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.6.4")
     implementation("com.squareup.retrofit2:converter-gson:2.6.4")
     implementation("com.squareup.retrofit2:converter-scalars:2.6.4")
+    implementation("com.squareup.okhttp3:okhttp:3.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:3.11.0")
 }
 
 // hilt 관련
