@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+
+    // hilt 관련
     id("com.google.dagger.hilt.android")
     id("kotlin-kapt")
 }
@@ -40,8 +42,11 @@ android {
 }
 
 dependencies {
+
+    // hilt 관련
     implementation("com.google.dagger:hilt-android:2.44")
     kapt("com.google.dagger:hilt-compiler:2.44")
+
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.10.0")
@@ -49,9 +54,17 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    // rxjava 의존성
     implementation("io.reactivex.rxjava3:rxjava:3.0.7")
+
+    // 레트로핏 관련
+    implementation("com.squareup.retrofit2:retrofit:2.6.4")
+    implementation("com.squareup.retrofit2:converter-gson:2.6.4")
+    implementation("com.squareup.retrofit2:converter-scalars:2.6.4")
 }
 
+// hilt 관련
 kapt{
     correctErrorTypes=true
 }
