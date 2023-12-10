@@ -1,13 +1,34 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+import Greeting from './GreetingApp';
+import ArticleApp from './ArticleApp';
+import Top5CDApp from './Top5CDApp';
+
+import './index.css';
+
+import reportWebVitals from './reportWebVitals';
+/*
+const router2 = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<Chap3App />}>
+      <Route path="/home" element={<Home />} />
+      <Route path="/topics" element={<Topics />} />
+      <Route path="/contact" element={<Contact />} />
+    </Route>
+  )
+);
+*/
+
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
 root.render(
   <React.StrictMode>
-    <App />
+  { 
+    <Greeting name="Jain" />
+    // <ArticleApp />         
+    // <Top5CDApp />         
+}    
   </React.StrictMode>
 );
 
