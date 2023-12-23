@@ -48,6 +48,7 @@ android {
     buildFeatures {
         viewBinding = true
         dataBinding = true
+        buildConfig = true
     }
 }
 
@@ -75,11 +76,20 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:3.11.0")
     implementation("com.squareup.okhttp3:logging-interceptor:3.11.0")
 
-    // 카카오 로그인
-    implementation("com.kakao.sdk:v2-user:2.19.0") // 카카오 로그인
+    // 카카오 로그인 - 추후 추가
+//    implementation("com.kakao.sdk:v2-user:2.19.0") // 카카오 로그인
 
     // 구글 맵
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+
+    // viewModel
+    implementation("androidx.activity:activity-ktx:1.8.2")
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
+
+    // lifecycle
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.6.2")
 }
 
 // hilt 관련
