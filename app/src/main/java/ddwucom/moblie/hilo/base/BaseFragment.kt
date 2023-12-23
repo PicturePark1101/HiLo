@@ -1,6 +1,7 @@
 package ddwucom.moblie.hilo.base
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,8 +21,13 @@ abstract class BaseFragment<T : ViewDataBinding>(@LayoutRes private val layoutRe
     ): View? {
         _binding = DataBindingUtil.inflate(inflater, layoutRes, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
+        Log.d("순서확인", "BaseFragment의 onCreateView")
+
+        initView()
         return binding.root
     }
+
+    protected open fun initView() {}
 
     override fun onDestroyView() {
         _binding = null
