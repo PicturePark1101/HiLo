@@ -8,10 +8,12 @@ import android.location.Location
 import android.os.Build
 import android.os.Looper
 import android.util.Log
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -149,6 +151,13 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
 
         binding.rcMap.adapter = adapter
         binding.rcMap.layoutManager = layoutManager
+
+        // 클릭했을 때 해당 위치로 카메라 이동
+        adapter.setOnLocItemClickListener(object : LocAdapter.OnLocClickListener {
+            override fun onLocItemClick(view: View, position: Int, loc: LocDto) {
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(loc.lat.toDouble(), loc.lot.toDouble()), 17F))
+            }
+        })
     }
 
     fun addMarker(loc: LocDto) {
