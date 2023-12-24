@@ -22,9 +22,13 @@ abstract class BaseFragment<T : ViewDataBinding>(@LayoutRes private val layoutRe
         _binding = DataBindingUtil.inflate(inflater, layoutRes, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         Log.d("순서확인", "BaseFragment의 onCreateView")
-
         initView()
+
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
     }
 
     protected open fun initView() {}

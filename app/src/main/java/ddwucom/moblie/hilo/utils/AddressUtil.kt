@@ -56,7 +56,7 @@ class AddressUtil {
             "울주군",
         )
 
-        val SEJONG_TOWN_LIST: List<String> = listOf()
+        val SEJONG_TOWN_LIST: List<String> = listOf("")
 
         val GYEONGGIDO_TOWN_LIST: List<String> = listOf(
             "수원시", "용인시", "고양시", "화성시", "성남시",

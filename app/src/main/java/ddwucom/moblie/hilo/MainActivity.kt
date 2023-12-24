@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationBarView
+import dagger.hilt.android.AndroidEntryPoint
 import ddwucom.moblie.hilo.base.BaseActivity
 import ddwucom.moblie.hilo.databinding.ActivityMainBinding
 
+@AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 
     lateinit var homeFragment: HomeFragment
