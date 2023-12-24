@@ -67,10 +67,12 @@
             app:mapType="normal"
             app:uiCompass="true"
             app:uiRotateGestures="true"
-            app:uiScrollGestures="false"
+            app:uiScrollGestures="true"
             app:uiTiltGestures="true"
             app:uiZoomControls="true"
-            app:uiZoomGestures="true"></fragment>
+            app:uiZoomGestures="true">
+
+        </fragment>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rc_map"
