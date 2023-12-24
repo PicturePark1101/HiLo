@@ -81,6 +81,7 @@ dependencies {
 
     // 구글 맵
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 
     // viewModel
     implementation("androidx.activity:activity-ktx:1.8.2")
