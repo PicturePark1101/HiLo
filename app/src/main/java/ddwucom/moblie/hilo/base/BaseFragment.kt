@@ -31,7 +31,13 @@ abstract class BaseFragment<T : ViewDataBinding>(@LayoutRes private val layoutRe
         super.onViewCreated(view, savedInstanceState)
     }
 
+    override fun onPause() {
+        super.onPause()
+        doOnPause()
+    }
+
     protected open fun initView() {}
+    protected open fun doOnPause() {}
 
     override fun onDestroyView() {
         _binding = null
