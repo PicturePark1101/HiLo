@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import ddwucom.moblie.hilo.base.BaseFragment
 import ddwucom.moblie.hilo.data.LocDto
@@ -130,13 +131,15 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
                 Log.d(TAG, locList.toString())
                 initRecyclerView(locList)
 
-                // 가장 첫번째로 온 장소로 카메라 이동
-                val fistLocLot = locList.get(0).lot
-                val firstLocLat = locList.get(0).lat
+                if (locList.size > 0) {
+                    // 가장 첫번째로 온 장소로 카메라 이동
+                    val fistLocLot = locList.get(0).lot
+                    val firstLocLat = locList.get(0).lat
 
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(firstLocLat.toDouble(), fistLocLot.toDouble()), 17F))
-                locList.forEach {
-                    addMarker(it)
+                    moveCamera(LatLng(firstLocLat.toDouble(), fistLocLot.toDouble()))
+                    locList.forEach {
+                        addMarker(it)
+                    }
                 }
             },
         )
@@ -155,11 +158,12 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
         // 클릭했을 때 해당 위치로 카메라 이동
         adapter.setOnLocItemClickListener(object : LocAdapter.OnLocClickListener {
             override fun onLocItemClick(view: View, position: Int, loc: LocDto) {
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(loc.lat.toDouble(), loc.lot.toDouble()), 17F))
+                moveCamera(LatLng(loc.lat.toDouble(), loc.lot.toDouble()))
             }
         })
     }
 
+    // 마커 추가
     fun addMarker(loc: LocDto) {
         val markerOptions: MarkerOptions = MarkerOptions()
         markerOptions.position(LatLng(loc.lat.toDouble(), loc.lot.toDouble()))
@@ -169,6 +173,23 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
         centerMarker = googleMap.addMarker(markerOptions)
         centerMarker?.showInfoWindow()
         centerMarker?.tag = "database_id"
+
+        googleMap.setOnInfoWindowClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("내 장소로 등록하기")
+                .setMessage("내 운동 장소로 등록하시겠습니까?")
+                .setNeutralButton("닫기") { dialog, which ->
+                }
+                .setPositiveButton("등록") { dialog, which ->
+                }
+                .show()
+        }
+    }
+
+
+    // 카메라 이동 함수
+    private fun moveCamera(lotLng: LatLng) {
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lotLng, 17F))
     }
 
     val mapReadyCallback = object : OnMapReadyCallback {

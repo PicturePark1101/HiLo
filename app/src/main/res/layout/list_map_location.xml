@@ -12,7 +12,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
         android:text="TextView"
-        android:textSize="20dp"
+        android:textSize="18dp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -43,12 +43,14 @@
 
     <androidx.appcompat.widget.AppCompatButton
 
-    android:id="@+id/button2"
-        android:layout_width="71dp"
-        android:layout_height="29dp"
-        android:layout_marginTop="68dp"
+        android:id="@+id/btn_list_map_rg"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="35dp"
         android:layout_marginEnd="16dp"
-        android:text="Button"
+        android:gravity="center"
+        android:text="내 장소로 등록"
+        android:textSize="13dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
