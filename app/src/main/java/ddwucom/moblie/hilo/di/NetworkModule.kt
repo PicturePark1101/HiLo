@@ -24,9 +24,9 @@ object NetworkModule {
     @Singleton
     fun provideHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
-            .readTimeout(10, TimeUnit.SECONDS)
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .writeTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(100, TimeUnit.SECONDS)
+            .connectTimeout(100, TimeUnit.SECONDS)
+            .writeTimeout(150, TimeUnit.SECONDS)
             .addInterceptor(getLoggingInterceptor())
             .build()
     }
@@ -60,38 +60,4 @@ object NetworkModule {
     private fun getLoggingInterceptor(): HttpLoggingInterceptor =
         HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
 
-//    @Provides
-//    fun provideBaseUrl() = "http://apis.data.go.kr/B551014/SRVC_API_SFMS_FACI/"
-//
-//    @Singleton
-//    @Provides
-//    fun provideOkHttpClient() = if (BuildConfig.DEBUG) {
-//        val loggingInterceptor = HttpLoggingInterceptor()
-//        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-//        OkHttpClient.Builder()
-//            .addInterceptor(loggingInterceptor)
-//            .build()
-//    } else {
-//        OkHttpClient.Builder().build()
-//    }
-//
-//    @Singleton
-//    @Provides
-//    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-//        return Retrofit.Builder()
-//            .client(okHttpClient)
-//            .baseUrl(provideBaseUrl())
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//    }
-//
-//    @Provides
-//    @Singleton
-//    fun provideApiService(retrofit: Retrofit): LocationApiService {
-//        return retrofit.create(LocationApiService::class.java)
-//    }
-//
-//    @Singleton
-//    @Provides
-//    fun provideMainRepository(apiService: LocationApiService) = LocationApiRepository(apiService)
 }
