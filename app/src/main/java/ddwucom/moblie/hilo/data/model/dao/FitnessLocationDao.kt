@@ -21,6 +21,9 @@ interface FitnessLocationDao {
     @Delete
     suspend fun deleteFood(loc: FitnessLocation)
 
+//    @Query("DELETE FROM fitness_location_table WHERE name=:name AND address=:address")
+//    suspend fun deleteLoc(name: String, address: String)
+
     // 이미 존재하는지 검사
     @Query("SELECT * FROM fitness_location_table WHERE name=:name AND address=:address")
     fun searchLocation(name: String, address: String): List<FitnessLocation>
