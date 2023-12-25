@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -40,9 +41,10 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
 
     private val TAG = "MapFragment"
 
-    private val locationApiViewModel: LocationApiViewModel by viewModels()
-    private val fitnessLocationViewModel: FitnessLocationViewModel by viewModels()
+    private val locationApiViewModel: LocationApiViewModel by activityViewModels()
+    private val fitnessLocationViewModel: FitnessLocationViewModel by activityViewModels()
 
+//    private lateinit var
     private lateinit var googleMap: GoogleMap
 
     private lateinit var locList: ArrayList<LocDto>
@@ -54,20 +56,22 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
         Log.d("순서확인", "MapFragment의 initView")
         checkPermissions()
 
+        locationApiViewModel.liveData.observe(viewLifecycleOwner, observer)
+
         // 지도
         val mapFragment: SupportMapFragment? =
             childFragmentManager.findFragmentById(R.id.map_googlemap) as SupportMapFragment?
         mapFragment?.getMapAsync(mapReadyCallback)
 
         // 첫번째 드롭박스
-        val adapter = ArrayAdapter(requireContext(), R.layout.list_korea_location, CITY_LIST)
+        val cityDropBoxAdapter = ArrayAdapter(requireContext(), R.layout.list_korea_location, CITY_LIST)
         val cityText = binding.etMapCity.editText as? AutoCompleteTextView
 
-        cityText?.setAdapter(adapter)
+        cityText?.setAdapter(cityDropBoxAdapter)
 
         cityText?.setOnItemClickListener { parent, view, position, id ->
 
-            val selectedCity = adapter.getItem(position).toString()
+            val selectedCity = cityDropBoxAdapter.getItem(position).toString()
             Log.d(TAG, selectedCity)
 
             handleItemSelected(selectedCity)
@@ -82,13 +86,16 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
         if (townList != null) {
             val adapter = ArrayAdapter(requireContext(), R.layout.list_korea_location, townList)
             val townText = binding.etMapTown.editText as? AutoCompleteTextView
+            townText?.setText("", false)
 
             // 새로 선택하면 리셋되어야함!
-            townText?.setText("", false)
 
             townText?.setAdapter(adapter)
 
             townText?.setOnItemClickListener { parent, view, position, id ->
+                Log.d("DROPBOX", adapter.getItem(position).toString())
+                Log.d("DROPBOX", " selectedCity : $selectedCity")
+
                 val selectedTown = adapter.getItem(position).toString()
                 requestLocation(selectedCity, selectedTown)
             }
@@ -98,6 +105,8 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
     // 두번째 드롭박스 선택했을 때 api 요청, 요청 받아 지도에 표시
     @RequiresApi(Build.VERSION_CODES.S)
     private fun requestLocation(selectedCity: String, selectedTown: String) {
+        Log.d("DROPBOX", "requestLocation : selectedTOWN $selectedTown")
+        Log.d("DROPBOX", "requestLocation :selectedCity : $selectedCity")
         val request = LocationApiRequest(
             getString(R.string.service_key),
             "1",
@@ -107,33 +116,68 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
             selectedTown,
         )
 
+        Log.d("DROPBOX", "requestLocation : selectedTOWN $selectedTown")
+        Log.d("DROPBOX", "requestLocation :selectedCity : $selectedCity")
+
+        Log.d("requestLocation", "")
+        // 홈 프래그먼트에서 다시 돌아올 경우 이전 상태 저장되어서 그걸로 요청감.....
         locationApiViewModel.loadData(request)
 
         // 두번째 드롭박스 눌렸을 때 레트로핏으로 요청함
-        locationApiViewModel.liveData.observe(
-            this,
-            Observer { response ->
-                centerMarker?.remove()
-                locList = response
-                Log.d(TAG, locList.toString())
-                initRecyclerView(locList)
+//        locationApiViewModel.liveData.observe(
+//            this,
+//            Observer { response ->
+//                centerMarker?.remove()
+//                locList = response
+//                Log.d("DROPBOX", "viewModel observe" + locList.toString())
+//
+//                initRecyclerView(locList)
+//
+//                if (locList.size > 0) {
+//                    // 가장 첫번째로 온 장소로 카메라 이동
+//                    val fistLocLot = locList.get(0).lot
+//                    val firstLocLat = locList.get(0).lat
+//
+//                    moveCamera(LatLng(firstLocLat.toDouble(), fistLocLot.toDouble()))
+//                    locList.forEach {
+//                        addMarker(it)
+//                    }
+//                }
+//            },
+//        )
+    }
 
-                if (locList.size > 0) {
-                    // 가장 첫번째로 온 장소로 카메라 이동
-                    val fistLocLot = locList.get(0).lot
-                    val firstLocLat = locList.get(0).lat
+    @RequiresApi(Build.VERSION_CODES.O)
+    private val observer = Observer<ArrayList<LocDto>> { response ->
+        centerMarker?.remove()
+        locList = response
+        Log.d("DROPBOX", "viewModel observe" + locList.toString())
 
-                    moveCamera(LatLng(firstLocLat.toDouble(), fistLocLot.toDouble()))
-                    locList.forEach {
-                        addMarker(it)
-                    }
-                }
-            },
-        )
+        initRecyclerView(locList)
+
+        if (locList.size > 0) {
+            // 가장 첫번째로 온 장소로 카메라 이동
+            val fistLocLot = locList.get(0).lot
+            val firstLocLat = locList.get(0).lat
+
+            moveCamera(LatLng(firstLocLat.toDouble(), fistLocLot.toDouble()))
+            locList.forEach {
+                addMarker(it)
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun reLoadData() {
+        locationApiViewModel.liveData.observe(viewLifecycleOwner, observer)
     }
 
     // 리사이클러뷰 시작
     private fun initRecyclerView(locList: ArrayList<LocDto>) {
+        locList.forEach {
+            Log.d("DROPBOX", "리사이클러뷰 init" + it.address)
+        }
+
         val adapter = LocApiAdapter(locList)
 
         val layoutManager = LinearLayoutManager(requireContext())
@@ -151,6 +195,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
 
         // [내 장소로 등록] 버튼 눌렀을 때 등록되도록
         adapter.setRegBtnClickListener(object : LocApiAdapter.OnRegiBtnClickListener {
+            @RequiresApi(Build.VERSION_CODES.O)
             override fun onRegiBtnClick(view: View, loc: LocDto) {
                 registerLocation(loc)
             }
@@ -169,18 +214,9 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
         centerMarker?.showInfoWindow()
         centerMarker?.tag = "database_id"
 
-        registerLocation(loc)
-//        googleMap.setOnInfoWindowClickListener {
-//            MaterialAlertDialogBuilder(requireContext())
-//                .setTitle("내 장소로 등록하기")
-//                .setMessage("내 운동 장소로 등록하시겠습니까?")
-//                .setNeutralButton("닫기") { dialog, which ->
-//                }
-//                .setPositiveButton("등록") { dialog, which ->
-//                    registerLocation(loc)
-//                }
-//                .show()
-//        }
+        googleMap.setOnInfoWindowClickListener {
+            registerLocation(loc)
+        }
     }
 
     // 카메라 이동 함수
@@ -258,4 +294,9 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
                 }
             }
         }
+
+    override fun doDestroyView() {
+        Log.d("DROPBOX", "doDestroyView")
+        locationApiViewModel.liveData.removeObservers(viewLifecycleOwner)
+    }
 }
