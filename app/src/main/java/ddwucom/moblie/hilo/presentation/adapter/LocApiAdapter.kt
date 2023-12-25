@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ddwucom.moblie.hilo.data.LocDto
 import ddwucom.moblie.hilo.databinding.ListMapLocationBinding
 
-class LocAdapter(val locList: ArrayList<LocDto>) : RecyclerView.Adapter<LocAdapter.LocViewHolder>() {
+class LocApiAdapter(val locList: ArrayList<LocDto>) : RecyclerView.Adapter<LocApiAdapter.LocViewHolder>() {
 
     interface OnLocClickListener {
         fun onLocItemClick(view: View, position: Int, loc : LocDto)
@@ -21,13 +21,13 @@ class LocAdapter(val locList: ArrayList<LocDto>) : RecyclerView.Adapter<LocAdapt
 
     override fun getItemCount(): Int = locList.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LocAdapter.LocViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LocApiAdapter.LocViewHolder {
         val locView = ListMapLocationBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
         return LocViewHolder(locView, locList, listener)
     }
 
-    override fun onBindViewHolder(holder: LocAdapter.LocViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: LocApiAdapter.LocViewHolder, position: Int) {
         holder.binding.tvLocName.text = locList[position].locName
         holder.binding.tvLocLoc.text = locList[position].address
         holder.binding.tvLocType.text = locList[position].locType

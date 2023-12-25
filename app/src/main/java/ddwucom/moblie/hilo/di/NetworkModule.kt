@@ -1,12 +1,9 @@
 package ddwucom.moblie.hilo.di
 
-import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import ddwucom.moblie.hilo.BuildConfig
-import ddwucom.moblie.hilo.data.repository.LocationApiRepository
 import ddwucom.moblie.hilo.data.service.LocationApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
