@@ -28,6 +28,6 @@ data class FitnessLocation(
     var regDate: String?,
 ) {
     override fun toString(): String {
-        return super.toString()
+        return name+address+lat+lot+locType+regDate
     }
 }
