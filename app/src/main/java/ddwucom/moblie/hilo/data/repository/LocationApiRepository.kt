@@ -3,7 +3,6 @@ package ddwucom.moblie.hilo.data.repository
 import ddwucom.moblie.hilo.data.model.request.LocationApiRequest
 import ddwucom.moblie.hilo.data.model.response.LocationApiResponse
 import ddwucom.moblie.hilo.data.service.LocationApiService
-import retrofit2.Call
 import retrofit2.Response
 import javax.inject.Inject
 

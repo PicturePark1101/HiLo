@@ -22,4 +22,10 @@ class FitnessLocationViewModel @Inject constructor(var fitnessLocationRepository
     fun removeLocation(fitnessLocation: FitnessLocation) = viewModelScope.launch {
         fitnessLocationRepository.removeLocation(fitnessLocation)
     }
+
+//    fun removeLocation(fitnessLocation: FitnessLocation) = viewModelScope.launch {
+// //        fitnessLocationRepository.removeLocation(fitnessLocation)
+//        Log.d("FitnessLocationViewModel", "${fitnessLocation.name.toString()} ${fitnessLocation.address.toString()} ")
+//        fitnessLocationRepository.removeLoc(fitnessLocation.name.toString(), fitnessLocation.address.toString())
+//    }
 }

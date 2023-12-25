@@ -27,7 +27,13 @@ constructor(private val repository: LocationApiRepository) : ViewModel() {
 
     // 매개변수로 데이터를 받아오도록 바꾸기..
     fun loadData(locationApiRequest: LocationApiRequest) {
+        Log.d(TAG, "호출이 왜 안되는지?")
+        Log.d(TAG, "${locationApiRequest.city}호출이 왜 안되는지?")
+        Log.d(TAG, "${locationApiRequest.town}호출이 왜 안되는지?")
+
         viewModelScope.launch {
+            Log.d(TAG, "요청시작")
+
             val response: Response<LocationApiResponse> = withContext(Dispatchers.IO) {
                 repository.getLocationInfo(locationApiRequest)
             }
@@ -72,5 +78,12 @@ constructor(private val repository: LocationApiRepository) : ViewModel() {
                 }
             }
         }
+    }
+
+//    override fun onCleared() {
+//        coroutineScope.cancel()
+//    }
+    fun clearData() {
+        _liveData.value = ArrayList()
     }
 }
