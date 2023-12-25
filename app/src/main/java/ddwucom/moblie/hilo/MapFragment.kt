@@ -148,6 +148,13 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
                 moveCamera(LatLng(loc.lat.toDouble(), loc.lot.toDouble()))
             }
         })
+
+        // [내 장소로 등록] 버튼 눌렀을 때 등록되도록
+        adapter.setRegBtnClickListener(object : LocApiAdapter.OnRegiBtnClickListener {
+            override fun onRegiBtnClick(view: View, loc: LocDto) {
+                registerLocation(loc)
+            }
+        })
     }
 
     // 마커 추가
@@ -162,17 +169,18 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
         centerMarker?.showInfoWindow()
         centerMarker?.tag = "database_id"
 
-        googleMap.setOnInfoWindowClickListener {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle("내 장소로 등록하기")
-                .setMessage("내 운동 장소로 등록하시겠습니까?")
-                .setNeutralButton("닫기") { dialog, which ->
-                }
-                .setPositiveButton("등록") { dialog, which ->
-                    registerLocation(loc)
-                }
-                .show()
-        }
+        registerLocation(loc)
+//        googleMap.setOnInfoWindowClickListener {
+//            MaterialAlertDialogBuilder(requireContext())
+//                .setTitle("내 장소로 등록하기")
+//                .setMessage("내 운동 장소로 등록하시겠습니까?")
+//                .setNeutralButton("닫기") { dialog, which ->
+//                }
+//                .setPositiveButton("등록") { dialog, which ->
+//                    registerLocation(loc)
+//                }
+//                .show()
+//        }
     }
 
     // 카메라 이동 함수
@@ -183,23 +191,31 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
     // 장소 Room DB에 저장하기..
     @RequiresApi(Build.VERSION_CODES.O)
     private fun registerLocation(loc: LocDto) {
-        val currentDate = LocalDate.now()
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val currentDateFormat = currentDate.format(formatter).toString()
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("내 장소로 등록하기")
+            .setMessage("내 운동 장소로 등록하시겠습니까?")
+            .setNeutralButton("닫기") { dialog, which ->
+            }
+            .setPositiveButton("등록") { dialog, which ->
+                val currentDate = LocalDate.now()
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                val currentDateFormat = currentDate.format(formatter).toString()
 
-        val rgLoc = FitnessLocation(
-            0,
-            loc.locName,
-            loc.address,
-            loc.lat,
-            loc.lot,
-            loc.locType,
-            currentDateFormat,
-        )
+                val rgLoc = FitnessLocation(
+                    0,
+                    loc.locName,
+                    loc.address,
+                    loc.lat,
+                    loc.lot,
+                    loc.locType,
+                    currentDateFormat,
+                )
 
-        fitnessLocationViewModel.addLocation(rgLoc)
+                fitnessLocationViewModel.addLocation(rgLoc)
 
-        Log.d(TAG, rgLoc.toString())
+                Log.d(TAG, rgLoc.toString())
+            }
+            .show()
     }
 
     val mapReadyCallback = object : OnMapReadyCallback {

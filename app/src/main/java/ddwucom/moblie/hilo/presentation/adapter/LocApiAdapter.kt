@@ -10,7 +10,7 @@ import ddwucom.moblie.hilo.databinding.ListMapLocationBinding
 class LocApiAdapter(val locList: ArrayList<LocDto>) : RecyclerView.Adapter<LocApiAdapter.LocViewHolder>() {
 
     interface OnLocClickListener {
-        fun onLocItemClick(view: View, position: Int, loc : LocDto)
+        fun onLocItemClick(view: View, position: Int, loc: LocDto)
     }
 
     lateinit var listener: OnLocClickListener
@@ -19,12 +19,22 @@ class LocApiAdapter(val locList: ArrayList<LocDto>) : RecyclerView.Adapter<LocAp
         this.listener = listener
     }
 
+    interface OnRegiBtnClickListener {
+        fun onRegiBtnClick(view: View, loc: LocDto)
+    }
+
+    lateinit var btnClickListener: OnRegiBtnClickListener
+
+    fun setRegBtnClickListener(listener: OnRegiBtnClickListener) {
+        this.btnClickListener = listener
+    }
+
     override fun getItemCount(): Int = locList.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LocApiAdapter.LocViewHolder {
         val locView = ListMapLocationBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
-        return LocViewHolder(locView, locList, listener)
+        return LocViewHolder(locView, locList, listener, btnClickListener)
     }
 
     override fun onBindViewHolder(holder: LocApiAdapter.LocViewHolder, position: Int) {
@@ -32,17 +42,22 @@ class LocApiAdapter(val locList: ArrayList<LocDto>) : RecyclerView.Adapter<LocAp
         holder.binding.tvLocLoc.text = locList[position].address
         holder.binding.tvLocType.text = locList[position].locType
     }
-    class LocViewHolder(val binding: ListMapLocationBinding,
-                        val locList : ArrayList<LocDto>,
-                        listener: OnLocClickListener) : RecyclerView.ViewHolder(binding.root,
-                   ){
-        init{
+    class LocViewHolder(
+        val binding: ListMapLocationBinding,
+        val locList: ArrayList<LocDto>,
+        listener: OnLocClickListener,
+        btnClickListener: OnRegiBtnClickListener,
+    ) : RecyclerView.ViewHolder(
+        binding.root,
+    ) {
+        init {
             binding.root.setOnClickListener {
                 listener.onLocItemClick(it, adapterPosition, locList[adapterPosition])
             }
 
             binding.btnListMapRg.setOnClickListener {
                 // 등록버튼
+                btnClickListener.onRegiBtnClick(it, locList[adapterPosition])
             }
         }
     }
