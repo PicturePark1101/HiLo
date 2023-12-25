@@ -97,8 +97,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
     implementation("androidx.lifecycle:lifecycle-common-java8:2.6.2")
 
-    // room
-
     // ROOM
     val room_version = "2.6.0"
 
@@ -109,6 +107,10 @@ dependencies {
 
 //    kapt("androidx.room:room-compiler:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
+
+
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
 
 }
 
