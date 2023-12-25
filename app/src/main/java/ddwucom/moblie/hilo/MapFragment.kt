@@ -1,28 +1,17 @@
 package ddwucom.moblie.hilo
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.location.Geocoder
-import android.location.Location
 import android.os.Build
-import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -35,25 +24,28 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import ddwucom.moblie.hilo.base.BaseFragment
 import ddwucom.moblie.hilo.data.LocDto
+import ddwucom.moblie.hilo.data.model.entity.FitnessLocation
 import ddwucom.moblie.hilo.data.model.request.LocationApiRequest
 import ddwucom.moblie.hilo.databinding.FragmentMapBinding
-import ddwucom.moblie.hilo.presentation.adapter.LocAdapter
+import ddwucom.moblie.hilo.presentation.adapter.LocApiAdapter
+import ddwucom.moblie.hilo.presentation.viewmodel.FitnessLocationViewModel
 import ddwucom.moblie.hilo.presentation.viewmodel.LocationApiViewModel
 import ddwucom.moblie.hilo.utils.AddressUtil.Companion.CITY_LIST
 import ddwucom.moblie.hilo.utils.AddressUtil.Companion.CITY_TOWN_MAP
-import kotlinx.coroutines.launch
-import java.util.Locale
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
 class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
 
-    private lateinit var googleMap: GoogleMap
     private val TAG = "MapFragment"
-    private val viewModel: LocationApiViewModel by viewModels()
+
+    private val locationApiViewModel: LocationApiViewModel by viewModels()
+    private val fitnessLocationViewModel: FitnessLocationViewModel by viewModels()
+
+    private lateinit var googleMap: GoogleMap
+
     private lateinit var locList: ArrayList<LocDto>
-    private lateinit var currentLoc: Location
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var geocoder: Geocoder
     var centerMarker: Marker? = null
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -63,10 +55,9 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
         checkPermissions()
 
         // 지도
-        val mapFragment: SupportMapFragment? = childFragmentManager.findFragmentById(R.id.map_googlemap) as SupportMapFragment?
+        val mapFragment: SupportMapFragment? =
+            childFragmentManager.findFragmentById(R.id.map_googlemap) as SupportMapFragment?
         mapFragment?.getMapAsync(mapReadyCallback)
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
-        geocoder = Geocoder(requireContext(), Locale.getDefault())
 
         // 첫번째 드롭박스
         val adapter = ArrayAdapter(requireContext(), R.layout.list_korea_location, CITY_LIST)
@@ -81,10 +72,6 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
 
             handleItemSelected(selectedCity)
         }
-    }
-
-    override fun doOnPause() {
-        fusedLocationClient.removeLocationUpdates(locCallback)
     }
 
     // dropdown에서 item 선택
@@ -120,10 +107,10 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
             selectedTown,
         )
 
-        viewModel.loadData(request)
+        locationApiViewModel.loadData(request)
 
         // 두번째 드롭박스 눌렸을 때 레트로핏으로 요청함
-        viewModel.liveData.observe(
+        locationApiViewModel.liveData.observe(
             this,
             Observer { response ->
                 centerMarker?.remove()
@@ -147,7 +134,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
 
     // 리사이클러뷰 시작
     private fun initRecyclerView(locList: ArrayList<LocDto>) {
-        val adapter = LocAdapter(locList)
+        val adapter = LocApiAdapter(locList)
 
         val layoutManager = LinearLayoutManager(requireContext())
         layoutManager.orientation = LinearLayoutManager.VERTICAL
@@ -156,7 +143,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
         binding.rcMap.layoutManager = layoutManager
 
         // 클릭했을 때 해당 위치로 카메라 이동
-        adapter.setOnLocItemClickListener(object : LocAdapter.OnLocClickListener {
+        adapter.setOnLocItemClickListener(object : LocApiAdapter.OnLocClickListener {
             override fun onLocItemClick(view: View, position: Int, loc: LocDto) {
                 moveCamera(LatLng(loc.lat.toDouble(), loc.lot.toDouble()))
             }
@@ -164,6 +151,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
     }
 
     // 마커 추가
+    @RequiresApi(Build.VERSION_CODES.O)
     fun addMarker(loc: LocDto) {
         val markerOptions: MarkerOptions = MarkerOptions()
         markerOptions.position(LatLng(loc.lat.toDouble(), loc.lot.toDouble()))
@@ -181,15 +169,37 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
                 .setNeutralButton("닫기") { dialog, which ->
                 }
                 .setPositiveButton("등록") { dialog, which ->
+                    registerLocation(loc)
                 }
                 .show()
         }
     }
 
-
     // 카메라 이동 함수
     private fun moveCamera(lotLng: LatLng) {
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lotLng, 17F))
+    }
+
+    // 장소 Room DB에 저장하기..
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun registerLocation(loc: LocDto) {
+        val currentDate = LocalDate.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val currentDateFormat = currentDate.format(formatter).toString()
+
+        val rgLoc = FitnessLocation(
+            0,
+            loc.locName,
+            loc.address,
+            loc.lat,
+            loc.lot,
+            loc.locType,
+            currentDateFormat,
+        )
+
+        fitnessLocationViewModel.addLocation(rgLoc)
+
+        Log.d(TAG, rgLoc.toString())
     }
 
     val mapReadyCallback = object : OnMapReadyCallback {
@@ -197,34 +207,6 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
             googleMap = map
             Log.d(TAG, "GoogleMap is ready")
         }
-    }
-
-    val locCallback: LocationCallback = object : LocationCallback() {
-        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-        override fun onLocationResult(locResult: LocationResult) {
-            currentLoc = locResult.locations.get(0)
-
-            val targetLoc: LatLng = LatLng(currentLoc.latitude, currentLoc.longitude)
-            Log.d(TAG, "위도: ${currentLoc.latitude}, 경도: ${currentLoc.longitude}")
-
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(targetLoc, 17F))
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.S)
-    val locRequest = LocationRequest.Builder(5000)
-        .setMinUpdateIntervalMillis(3000)
-        .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
-        .build()
-
-    @RequiresApi(Build.VERSION_CODES.S)
-    @SuppressLint("MissingPermission")
-    private fun startLocUpdates() {
-        fusedLocationClient.requestLocationUpdates(
-            locRequest,
-            locCallback,
-            Looper.getMainLooper(),
-        )
     }
 
     fun checkPermissions() {
