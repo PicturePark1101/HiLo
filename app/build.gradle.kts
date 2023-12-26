@@ -26,17 +26,17 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "KAKAO_API_KEY", getApiKey("KAKAO_API_KEY"))
+//        buildConfigField("String", "KAKAO_API_KEY", getApiKey("KAKAO_API_KEY"))
     }
 
     buildTypes {
         debug {
-            manifestPlaceholders["KAKAO_API_KEY_MANIFEST"] = getApiKey("KAKAO_API_KEY_MANIFEST") as String
+//            manifestPlaceholders["KAKAO_API_KEY_MANIFEST"] = getApiKey("KAKAO_API_KEY_MANIFEST") as String
         }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            manifestPlaceholders["KAKAO_API_KEY_MANIFEST"] = getApiKey("KAKAO_API_KEY_MANIFEST") as String
+//            manifestPlaceholders["KAKAO_API_KEY_MANIFEST"] = getApiKey("KAKAO_API_KEY_MANIFEST") as String
         }
     }
 
@@ -62,8 +62,7 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.5")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.5")
 //    kapt("com.google.dagger:hilt-android-compiler:2.48")
-     kapt("com.google.dagger:hilt-android-compiler:2.48")
-
+    kapt("com.google.dagger:hilt-android-compiler:2.48")
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -110,19 +109,16 @@ dependencies {
 //    kapt("androidx.room:room-compiler:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
 
-
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-
-
 }
 
 // hilt 관련
-//kapt {
+// kapt {
 //    correctErrorTypes = true
-//}
+// }
 
-fun getApiKey(propertyKey: String): String {
-    val properties = gradleLocalProperties(rootDir)
-    return properties.getProperty(propertyKey) ?: throw NoSuchElementException("Property '$propertyKey' not found in local.properties")
-//    return gradleLocalProperties(rootDir).getProperty(propertyKey)
-}
+//fun getApiKey(propertyKey: String): String {
+//    val properties = gradleLocalProperties(rootDir)
+//    return properties.getProperty(propertyKey) ?: throw NoSuchElementException("Property '$propertyKey' not found in local.properties")
+////    return gradleLocalProperties(rootDir).getProperty(propertyKey)
+//}
