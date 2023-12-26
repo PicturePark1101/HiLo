@@ -1,5 +1,6 @@
 package ddwucom.moblie.hilo
 
+import android.content.Intent
 import android.os.Build
 import android.text.InputFilter
 import android.util.Log
@@ -7,6 +8,7 @@ import android.view.View
 import android.widget.EditText
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,9 +18,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import ddwucom.moblie.hilo.base.BaseFragment
 import ddwucom.moblie.hilo.data.model.entity.FitnessLocation
+import ddwucom.moblie.hilo.data.model.entity.FitnessRecord
 import ddwucom.moblie.hilo.databinding.FragmentHomeBinding
+import ddwucom.moblie.hilo.presentation.adapter.FitnessAdapter
 import ddwucom.moblie.hilo.presentation.adapter.LocRegAdapter
 import ddwucom.moblie.hilo.presentation.viewmodel.FitnessLocationViewModel
+import ddwucom.moblie.hilo.presentation.viewmodel.FitnessRecordViewModel
 import ddwucom.moblie.hilo.presentation.viewmodel.MyFitnessShViewModel
 
 @AndroidEntryPoint
@@ -26,8 +31,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     private val fitnessLocationViewModel: FitnessLocationViewModel by activityViewModels()
     private val myFitnessShViewModel: MyFitnessShViewModel by activityViewModels()
+    private val fitnessRecordViewModel: FitnessRecordViewModel by activityViewModels()
 
     lateinit var locRegAdapter: LocRegAdapter
+    lateinit var fitnessRecordAdapter: FitnessAdapter
+
     private val TAG = "HomeFragment"
 
     override fun initView() {
@@ -36,9 +44,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         Log.d(TAG, "${myFitnessShViewModel.allData.value}")
         // 등록한 장소 리사이클러뷰
         ryRgLocation()
+        // 운동 기록 리사이클러뷰
+        ryfitnessRecord()
 
         // 등록한 운동 출력
         setView()
+
+        binding.btnHomeFitnessRg.setOnClickListener {
+            val intent = Intent(requireContext(), RecordFitnessActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     override fun setView() {
@@ -116,6 +131,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
         alert.show()
     }
+
+    // 등록한 운동 장소 리사이클러뷰
     private fun ryRgLocation() {
         locRegAdapter = LocRegAdapter()
 
@@ -156,5 +173,46 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                     .show()
             }
         })
+    }
+    private fun ryfitnessRecord() {
+        fitnessRecordAdapter = FitnessAdapter()
+
+        binding.rcHomeMyFitnessList.adapter = fitnessRecordAdapter
+        binding.rcHomeMyFitnessList.layoutManager = LinearLayoutManager(requireContext())
+
+        fitnessRecordViewModel.allLocation.observe(
+            this,
+            Observer {
+                fitnessRecordAdapter.fitnessRecords = it
+                fitnessRecordAdapter.notifyDataSetChanged()
+                Log.d(TAG, "등록한 운동 리스트 조회")
+                Log.d(TAG, it.toString())
+            },
+
+        )
+
+        fitnessRecordAdapter.setRvBtnClickListener(object : FitnessAdapter.OnRvBtnClickListener {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onRvBtnClick(view: View, loc: FitnessRecord?) {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("내 운동기록 삭제")
+                    .setMessage("내 운동 장소에서 삭제하시겠습니까?")
+                    .setNeutralButton("닫기") { dialog, which ->
+                    }
+                    .setPositiveButton("삭제") { dialog, which ->
+                        if (loc != null) {
+                            Log.d(TAG, loc.placeName+ loc.fitnessName)
+                        }
+
+                        if (loc != null) {
+                            fitnessRecordViewModel.removeLocation(loc)
+                        }
+                    }
+                    .show()
+            }
+        })
+    }
+    fun clickRvBtn(){
+
     }
 }

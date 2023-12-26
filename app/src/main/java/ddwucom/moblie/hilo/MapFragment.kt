@@ -56,7 +56,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
         Log.d("순서확인", "MapFragment의 initView")
         checkPermissions()
 
-        locationApiViewModel.liveData.observe(viewLifecycleOwner, observer)
+//        locationApiViewModel.liveData.observe(viewLifecycleOwner, observer)
 
         // 지도
         val mapFragment: SupportMapFragment? =
@@ -122,29 +122,6 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
         Log.d("requestLocation", "")
         // 홈 프래그먼트에서 다시 돌아올 경우 이전 상태 저장되어서 그걸로 요청감.....
         locationApiViewModel.loadData(request)
-
-        // 두번째 드롭박스 눌렸을 때 레트로핏으로 요청함
-//        locationApiViewModel.liveData.observe(
-//            this,
-//            Observer { response ->
-//                centerMarker?.remove()
-//                locList = response
-//                Log.d("DROPBOX", "viewModel observe" + locList.toString())
-//
-//                initRecyclerView(locList)
-//
-//                if (locList.size > 0) {
-//                    // 가장 첫번째로 온 장소로 카메라 이동
-//                    val fistLocLot = locList.get(0).lot
-//                    val firstLocLat = locList.get(0).lat
-//
-//                    moveCamera(LatLng(firstLocLat.toDouble(), fistLocLot.toDouble()))
-//                    locList.forEach {
-//                        addMarker(it)
-//                    }
-//                }
-//            },
-//        )
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
