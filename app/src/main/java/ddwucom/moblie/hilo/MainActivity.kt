@@ -7,6 +7,7 @@ import com.google.android.material.navigation.NavigationBarView
 import dagger.hilt.android.AndroidEntryPoint
 import ddwucom.moblie.hilo.base.BaseActivity
 import ddwucom.moblie.hilo.databinding.ActivityMainBinding
+import ddwucom.moblie.hilo.presentation.calendar.CalendarFragment
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {

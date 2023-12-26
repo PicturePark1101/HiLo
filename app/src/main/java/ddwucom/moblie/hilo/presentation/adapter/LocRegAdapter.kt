@@ -45,14 +45,18 @@ class LocRegAdapter() : RecyclerView.Adapter<LocRegAdapter.LocViewHolder>() {
         binding.root,
     ) {
         init {
+            binding.root.setOnLongClickListener{
+                listener.onRvBtnClick(it, fitnessLocations?.get(adapterPosition))
+                false
+            }
             binding.root.setOnClickListener {
 //                listener.onLocItemClick(it, adapterPosition,
 //                    fitnessLocations?.get(adapterPosition) ?: fitnessLocations()
 //                )
             }
-            binding.btnRgLocRv.setOnClickListener {
-                listener.onRvBtnClick(it, fitnessLocations?.get(adapterPosition))
-            }
+//            binding.btnRgLocRv.setOnClickListener {
+//                listener.onRvBtnClick(it, fitnessLocations?.get(adapterPosition))
+//            }
         }
     }
 }
