@@ -29,6 +29,7 @@ abstract class BaseFragment<T : ViewDataBinding>(@LayoutRes private val layoutRe
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setView()
     }
 
     override fun onResume() {
@@ -42,14 +43,15 @@ abstract class BaseFragment<T : ViewDataBinding>(@LayoutRes private val layoutRe
     }
 
     protected open fun initView() {}
+    protected open fun setView() {}
+
     protected open fun doOnPause() {}
     protected open fun doDestroyView() {}
-    protected open fun reLoadData(){}
+    protected open fun reLoadData() {}
 
     override fun onDestroyView() {
         _binding = null
         doDestroyView()
         super.onDestroyView()
-
     }
 }
